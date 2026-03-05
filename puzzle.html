@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Image Puzzle Game</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <img src="lcbalogo.png" alt="Lcba Logo">
+  <h1> LCBA </h1>
+</div>
+
+<!-- Navigation Bar -->
+<div class="navbar">
+  <a href="aboutlcba.html"> LCBA </a>
+  <a href="aboutstem.html"> STEM</a>
+  <a href="imagegallery.html">IMAGE GALLERY</a>
+  <a href="videogallery.html">VIDEO GALLERY</a>
+  <a href="puzzle.html" style="float:right">GAMES</a>
+</div>
+
+
+<h1>Image Sliding Puzzle</h1>
+
+<div id="info">
+    Time: <span id="time">0</span>s |
+    Score: <span id="score">0</span>
+</div>
+
+<button onclick="startGame()">Shuffle</button>
+
+<div id="puzzle"></div>
+ 
+<script>
+  let timerInterval;
+let time = 0;
+let score = 0;
+let size = 4;
+let pieces = [];
+
+function startTimer(){
+    clearInterval(timerInterval);
+    time = 0;
+    document.getElementById("time").textContent = time;
+    timerInterval = setInterval(()=>{
+        time++;
+        document.getElementById("time").textContent = time;
+    },1000);
+}
+
+function updateScore(){
+    score++;
+    document.getElementById("score").textContent = score;
+}
+
+function startGame(){
+    score = 0;
+    document.getElementById("score").textContent = score;
+
+    pieces = [];
+    for(let i=0;i<15;i++) pieces.push(i);
+    pieces.push(null);
+
+    shuffle(pieces);
+    startTimer();
+    render();
+}
+
+function render(){
+    const puzzle = document.getElementById("puzzle");
+    puzzle.innerHTML="";
+
+    pieces.forEach((p,i)=>{
+        let div=document.createElement("div");
+        div.className="tile";
+
+        if(p===null){
+            div.classList.add("empty");
+        }else{
+            div.style.backgroundImage="url('https://picsum.photos/320')";
+            div.style.backgroundSize="320px 320px";
+
+            let row=Math.floor(p/size);
+            let col=p%size;
+            div.style.backgroundPosition=`-${col*80}px -${row*80}px`;
+
+            div.onclick=()=>move(i);
+        }
+
+        puzzle.appendChild(div);
+    });
+}
+
+function move(i){
+    let empty=pieces.indexOf(null);
+    let valid=[i-1,i+1,i-4,i+4];
+
+    if(valid.includes(empty) &&
+    ((Math.abs(i-empty)==1 && Math.floor(i/4)==Math.floor(empty/4)) ||
+     Math.abs(i-empty)==4)){
+
+        [pieces[i],pieces[empty]]=[pieces[empty],pieces[i]];
+        updateScore();
+        render();
+        checkWin();
+    }
+}
+
+function checkWin(){
+    for(let i=0;i<15;i++){
+        if(pieces[i]!==i){
+            return;
+        }
+    }
+    clearInterval(timerInterval);
+    alert("Puzzle Completed! Time: " + time + " seconds. Moves: " + score);
+}
+
+function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
+        let j=Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]]=[arr[j],arr[i]];
+    }
+}
+
+startGame();
+</script>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<!-- Footer -->
+<div class="footer">
+  <p>© 2026 Laguna College of Business and Arts</p>
+</div>
+
+
+</body>
+</html>
